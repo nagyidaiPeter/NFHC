@@ -1,0 +1,68 @@
+﻿Woody comps: 
+	Comp: UnityEngine.Transform 
+	Comp: NFH.Game.Actor 
+	Comp: UnityEngine.AudioSource 
+	Comp: NFH.Game.ActorCollisionHandler 
+	Comp: UnityEngine.Rigidbody2D 
+	Comp: UnityEngine.CapsuleCollider2D 
+	Comp: NFH.Game.WoodyMovement 
+	Comp: NFH.Game.Logic.ActorBrain 
+	Comp: NFH.DevTools.BrainScriptDebugger 
+	Comp: NFH.Game.Logic.EntityActionHandler 
+	Comp: NFH.Game.InventoryHandler 
+	Comp: NFH.Game.DescriptionHandler 
+	Comp: NFH.Game.DynamicSpriteSorter 
+Woody childs: 
+Child: SpriteAnimPlayer 
+	SpriteAnimPlayer Comp: UnityEngine.Transform 
+	SpriteAnimPlayer Comp: NFH.Game.SpriteAnimPlayer 
+	SpriteAnimPlayer Comp: UnityEngine.SpriteRenderer 
+	SpriteAnimPlayer Comp: Animancer.AnimancerComponent 
+	SpriteAnimPlayer Comp: UnityEngine.Animator 
+	SpriteAnimPlayer Comp: NFH.Game.AnimEventHandler 
+Child: anchor_progressbar 
+	anchor_progressbar Comp: UnityEngine.Transform 
+	anchor_progressbar Comp: NFH.Game.Anchor 
+Child: anchor_bubble 
+	anchor_bubble Comp: UnityEngine.Transform 
+	anchor_bubble Comp: NFH.Game.Anchor 
+Child: anchor_minigame 
+	anchor_minigame Comp: UnityEngine.Transform 
+	anchor_minigame Comp: NFH.Game.Anchor 
+Child: anchor_focus 
+	anchor_focus Comp: UnityEngine.Transform 
+	anchor_focus Comp: NFH.Game.Anchor 
+
+
+
+
+Neighbour comps: 
+Comp: UnityEngine.Transform 
+Comp: NFH.Game.Actor 
+Comp: UnityEngine.AudioSource 
+Comp: NFH.Game.NeighborMovement 
+Comp: NFH.Game.Logic.ActorBrain 
+Comp: NFH.Game.Logic.EntityActionHandler 
+Comp: NFH.DevTools.BrainScriptDebugger 
+Comp: NFH.Game.DescriptionHandler 
+Comp: NFH.Game.DynamicSpriteSorter 
+Neighbour childs: 
+Child: SpriteAnimPlayer 
+	SpriteAnimPlayer Comp: UnityEngine.Transform 
+	SpriteAnimPlayer Comp: NFH.Game.SpriteAnimPlayer 
+	SpriteAnimPlayer Comp: UnityEngine.SpriteRenderer 
+	SpriteAnimPlayer Comp: Animancer.AnimancerComponent 
+	SpriteAnimPlayer Comp: UnityEngine.Animator 
+	SpriteAnimPlayer Comp: NFH.Game.AnimEventHandler 
+Child: anchor_progressbar 
+	anchor_progressbar Comp: UnityEngine.Transform 
+	anchor_progressbar Comp: NFH.Game.Anchor 
+Child: anchor_bubble 
+	anchor_bubble Comp: UnityEngine.Transform 
+	anchor_bubble Comp: NFH.Game.Anchor 
+Child: anchor_minigame 
+	anchor_minigame Comp: UnityEngine.Transform 
+	anchor_minigame Comp: NFH.Game.Anchor 
+Child: anchor_focus 
+	anchor_focus Comp: UnityEngine.Transform 
+	anchor_focus Comp: NFH.Game.Anchor 

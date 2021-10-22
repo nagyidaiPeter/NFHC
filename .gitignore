@@ -4,12 +4,14 @@
 #
 /Nfhc-UI/[Ll]ibrary/
 /Nfhc-UI/[Tt]emp/
-/Nfhc-UI/[Oo]bj/
 /Nfhc-UI/[Bb]uild/
 /Nfhc-UI/[Bb]uilds/
 /Nfhc-UI/[Ll]ogs/
 /Nfhc-UI/[Mm]emoryCaptures/
-/bin/
+/*/[Bb]in/
+/*/[Oo]bj/
+/[Bb]in/
+/[Pp]ackages/
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/[Aa]ssets/**/*.meta
@@ -43,6 +45,8 @@ ExportedObj/
 *.mdb
 *.opendb
 *.VC.db
+*.targets
+*.props
 
 # Unity3D generated meta files
 *.pidb.meta

@@ -1,0 +1,17 @@
+ManifestFileVersion: 0
+CRC: 2648524742
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: chatlog
+      Dependencies:
+        Dependency_0: chatcanvas
+    Info_1:
+      Name: chatkeyhint
+      Dependencies: {}
+    Info_2:
+      Name: serverbrowser
+      Dependencies: {}
+    Info_3:
+      Name: chatcanvas
+      Dependencies: {}
