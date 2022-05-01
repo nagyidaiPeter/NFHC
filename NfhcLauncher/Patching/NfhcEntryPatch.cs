@@ -14,6 +14,7 @@ namespace NfhcLauncher.Patching
         //1 341 952
         //1 338 880
         public const string GAME_ASSEMBLY_NAME = "Assembly-CSharp.dll";
+        public const string ORIGINAL_GAME_ASSEMBLY_NAME = "Assembly-CSharp-ORIGINAL.dll";
         public const string PoCoopASSEMBLY_NAME = "NfhcBootloader.dll";
         public const string GAME_ASSEMBLY_MODIFIED_NAME = "Assembly-CSharp-Nfhc.dll";
 
@@ -37,6 +38,7 @@ namespace NfhcLauncher.Patching
         public void Apply()
         {
             string assemblyCSharp = Path.Combine(NfhcManagedPath, GAME_ASSEMBLY_NAME);
+            string originalAssemblyCSharp = Path.Combine(NfhcManagedPath, ORIGINAL_GAME_ASSEMBLY_NAME);
             string NfhcPatcherPath = Path.Combine(NfhcManagedPath, PoCoopASSEMBLY_NAME);
             string modifiedAssemblyCSharp = Path.Combine(NfhcManagedPath, GAME_ASSEMBLY_MODIFIED_NAME);
 
@@ -44,6 +46,9 @@ namespace NfhcLauncher.Patching
             {
                 File.Delete(modifiedAssemblyCSharp);
             }
+
+            //Create copy of original for restoration
+            File.Copy(assemblyCSharp, originalAssemblyCSharp, true);
 
             using (ModuleDefMD module = ModuleDefMD.Load(assemblyCSharp))
             using (ModuleDefMD NfhcPatcherAssembly = ModuleDefMD.Load(NfhcPatcherPath))
@@ -68,7 +73,17 @@ namespace NfhcLauncher.Patching
             {
                 throw error;
             }
+
+            //Overwrite with patched one
             File.Move(modifiedAssemblyCSharp, assemblyCSharp);
+        }
+
+        public void Revert()
+        {
+            string assemblyCSharp = Path.Combine(NfhcManagedPath, GAME_ASSEMBLY_NAME);
+            string originalAssemblyCSharp = Path.Combine(NfhcManagedPath, ORIGINAL_GAME_ASSEMBLY_NAME);
+            
+            File.Copy(originalAssemblyCSharp, assemblyCSharp, true);
         }
 
         private Exception RetryWait(Action action, int interval, int retries = 0)

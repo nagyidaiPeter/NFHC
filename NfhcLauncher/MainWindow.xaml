@@ -28,8 +28,9 @@
             <Label>Neighbours back from Hell install folder:</Label>
             <TextBox Margin="10, 0, 0, 0" MaxHeight="18" HorizontalAlignment="Left" Width="300" Text="{Binding NfhPath}"/>
         </StackPanel>
-        
+
         <Button MaxWidth="150" MaxHeight="50" FontSize="16" Grid.Row="1" Command="{Binding Patch}">Monkey patch!</Button>
-        
+        <Button MaxWidth="150" MaxHeight="50" FontSize="16" Grid.Row="2" Command="{Binding RevertPatch}">Revert patch!</Button>
+
     </Grid>
 </Window>

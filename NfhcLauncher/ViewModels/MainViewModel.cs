@@ -44,7 +44,8 @@ namespace NfhcLauncher.ViewModels
 
 
         public RelayCommand Patch { get; }
-               
+        public RelayCommand RevertPatch { get; }
+
 
         public MainViewModel()
         {
@@ -60,7 +61,7 @@ namespace NfhcLauncher.ViewModels
 
             Patch = new RelayCommand(o => 
             {
-                // TODO: The launcher should override FileRead win32 API for the Subnautica process to give it the modified Assembly-CSharp from memory 
+                // TODO: The launcher should override FileRead win32 API for the NBFH process to give it the modified Assembly-CSharp from memory 
                 string bootloaderName = "NfhcBootloader.dll";
                 try
                 {
@@ -78,6 +79,11 @@ namespace NfhcLauncher.ViewModels
 
                 NfhcEntryPatch.Remove(); // Remove any previous instances first.
                 NfhcEntryPatch.Apply();
+            });
+
+            RevertPatch = new RelayCommand(o =>
+            {
+                NfhcEntryPatch.Revert();
             });
         }
 
