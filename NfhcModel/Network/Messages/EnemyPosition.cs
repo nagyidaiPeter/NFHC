@@ -30,6 +30,10 @@ namespace NfhcModel.Network.Messages
         [ProtoMember(6)]
         public bool IsHidden { get; set; }
 
+        [ProtoMember(7)]
+        public string CurrentTask { get; set; }
+
+
         public EnemyPosition()
         {
             MsgType = MessageTypes.EnemyTransform;

@@ -105,11 +105,15 @@ namespace NfhcModel.MonoBehaviours
                                     Y = neighbor.transform.localPosition.y
                                 };
 
+                                var brainScript = enemyBrain.GetBrainScript();
+                                var brainState = brainScript.GetState();
+
                                 enemyPosition.Room = enemyBrain.CurrentRoom.RoomName;
                                 enemyPosition.SenderID = playerManager.LocalPlayer.ID;
                                 enemyPosition.Animation = enemyBrain.Entity.CurrentAnimName;
                                 enemyPosition.AnimTime = enemyBrain.Entity.SpriteAnimPlayer.CurrentAnimTime;
                                 enemyPosition.IsHidden = enemyBrain.Entity.IsHidden;
+                                enemyPosition.CurrentTask = brainState.Method.Name;
                                 serverEnemyPos.SendMessage(enemyPosition, playerManager.LocalPlayer);
                             }
                         }
