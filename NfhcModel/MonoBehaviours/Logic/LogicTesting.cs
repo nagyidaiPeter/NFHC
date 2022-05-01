@@ -2,7 +2,9 @@
 using NFH.DevTools;
 using NFH.Game;
 using NFH.Game.Logic;
+using NfhcModel.Core;
 using NfhcModel.Logger;
+using NfhcModel.Network;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -16,9 +18,19 @@ namespace NfhcModel.MonoBehaviours
     {
         private ActorBrain woody, neighbour;
 
-        public delegate void CustomAction(ActorBrain brain);
         GameObject woodyInstance;
+
         bool triggered = false;
+
+        private PlayerManager _playerManager;
+        internal PlayerManager GetPlayerManager
+        {
+            get
+            {
+                _playerManager = _playerManager ?? NfhcServiceLocator.LocateService<PlayerManager>();
+                return _playerManager;
+            }
+        }
 
         void Start()
         {
@@ -28,11 +40,12 @@ namespace NfhcModel.MonoBehaviours
                 triggered = false;
                 if (LogicController.HasInstance)
                 {
-                    LogicController.Instance.OnLevelWasInitialized += (level) => {
+                    LogicController.Instance.OnLevelWasInitialized += (level) =>
+                    {
                         Log.Info($"Set lives to 1");
                         LogicController.Instance.TheGameScore.LivesCount = 1;
                         LogicController.Instance.TheGameScore.UnPauseNotifications(true);
-                    };                   
+                    };
                 }
             };
         }
@@ -112,17 +125,15 @@ namespace NfhcModel.MonoBehaviours
                 }
             }
 
-            if (woodyInstance != null && !triggered)
+            foreach (var player in GetPlayerManager.Players.Values)
             {
-                if (woodyInstance.GetComponent<ActorBrain>().CurrentRoom == neighbour.CurrentRoom)
+                if (player.Woody != null && !triggered)
                 {
-                    //FightCommand cmd = FightCommand.Create("fight", woodyInstance.GetComponent<Actor>(), TriggerFlag.InSameRoom);
-                    //neighbour.HandleTriggerCommand(cmd);
-                    //FightJob job = FightJob.Create(woodyInstance.GetComponent<ActorBrain>());
-                    //neighbour.AddJob(job);
-
-                    SetupDieCommands();
-                    triggered = true;
+                    if (player.Woody.GetComponent<ActorBrain>().CurrentRoom == neighbour.CurrentRoom)
+                    {
+                        SetupDieCommands(player.Woody.GetComponent<ActorBrain>(), neighbour);
+                        triggered = true;
+                    }
                 }
             }
 
@@ -218,37 +229,19 @@ namespace NfhcModel.MonoBehaviours
                 {
                     Log.Info($"Failed to get Room: {room == null} or Entity: {woodyInstance.GetComponent<GameEntity>() == null}");
                 }
-
-                neighbour = LogicController.Instance.GetAllActorBrains().FirstOrDefault(x => x.IsNeighbor);
-                woody = LogicController.Instance.GetAllActorBrains().FirstOrDefault(x => x.IsWoody);
-
-                try
-                {
-                    SetupDieCommands();
-
-                    foreach (var action in actionHandler.Actions)
-                    {
-                        Log.Info($"Action: {action?.ActionName} Actor: {action?.ActorName} ActorBrain: {action?.ActorBrain?.name}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Info(ex);
-                }
-
                 Log.Info($"Successfully added new test woody!");
             }
         }
 
-        private void SetupDieCommands()
+        private void SetupDieCommands(ActorBrain woody, ActorBrain neighbour)
         {
-            FightCommand cmd = FightCommand.Create("fight", woodyInstance.GetComponent<Actor>(), TriggerFlag.InSameRoom);
+            FightCommand cmd = FightCommand.Create("fight", woody.GetComponent<Actor>(), TriggerFlag.InSameRoom);
             neighbour.HandleTriggerCommand(cmd);
 
             DieCommand dieCmd = DieCommand.Create("die", neighbour.GetComponent<Actor>(), TriggerFlag.InSameRoom);
-            woodyInstance.GetComponent<ActorBrain>().HandleTriggerCommand(dieCmd);
+            woody.HandleTriggerCommand(dieCmd);
 
-            woodyInstance.GetComponent<EntityActionHandler>().SetRuntimeReferencesForActions();
+            woody.GetComponent<EntityActionHandler>().SetRuntimeReferencesForActions();
             neighbour.GetComponent<EntityActionHandler>().SetRuntimeReferencesForActions();
 
             Log.Info("Fight-Die commands issued!");

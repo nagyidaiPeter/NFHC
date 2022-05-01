@@ -8,6 +8,7 @@ using NfhcModel.Network.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -57,46 +58,89 @@ namespace NfhcModel.Network.ClientModul.ClientProcessors
                     {
                         ActorBrain originalWoody = GameObject.FindObjectsOfType<ActorBrain>().FirstOrDefault(x => x.IsWoody);
 
-                        GameObject woodyInstance = new GameObject("woody");
+                        var woodyInstance = Transform.Instantiate(originalWoody.gameObject, originalWoody.transform.parent);//new GameObject("woody");
+                        woodyInstance.transform.parent = originalWoody.transform.parent;
+                        woodyInstance.name = "Woody-" + GetPlayerManager.Players.Count;
 
-                        woodyInstance.AddComponent<CapsuleCollider2D>();
-                        var actor = woodyInstance.AddComponent<Actor>();
-                        ActorMovementBase.AddRigidBody(actor);
+                        var oldActionHandler = originalWoody.GetComponent<EntityActionHandler>();
 
-                        woodyInstance.AddComponent<ActorCollisionHandler>();
+                        var actor = woodyInstance.GetComponent<Actor>();
+                        var actorBrain = woodyInstance.GetComponent<ActorBrain>();
+                        var actionHandler = woodyInstance.GetComponent<EntityActionHandler>();
+                        var entity = woodyInstance.GetComponent<GameEntity>();
 
+                        var brainProp = actor.GetType().GetField("_brain", BindingFlags.NonPublic | BindingFlags.Instance);
+                        brainProp.SetValue(actor, actorBrain);
 
-                        woodyInstance.AddComponent(originalWoody.GetComponent<EntityActionHandler>());
+                        entity.WorldObjectName = woodyInstance.name;
 
+                        var prop = actionHandler.GetType().GetField("_entity", BindingFlags.NonPublic | BindingFlags.Instance);
+                        prop.SetValue(actionHandler, entity);
 
-                        actor.AnimSet = originalWoody.GetComponent<Actor>().AnimSet;
-                        var actorMovBase = woodyInstance.AddComponent<WoodyMovement>();
+                        actionHandler.Actions.Clear();
 
-                        foreach (Transform child in originalWoody.transform)
+                        foreach (var action in oldActionHandler.Actions)
                         {
-                            GameObject.Instantiate(child.gameObject, woodyInstance.transform);
+                            EntityAction newAction = new EntityAction(action.ActionName);
+
+                            action.CopyFieldsTo(newAction);
+
+                            if (newAction.ActorName == "woody")
+                            {
+                                var nameProp = newAction.GetType().GetField("_actorName", BindingFlags.NonPublic | BindingFlags.Instance);
+                                nameProp.SetValue(newAction, woodyInstance.name);
+                            }
+
+                            if (newAction.ActorBrain == originalWoody.gameObject.GetComponent<ActorBrain>())
+                            {
+                                newAction.ActorBrain = actorBrain;
+                            }
+
+                            var handlerProp = newAction.GetType().GetField("_handler", BindingFlags.NonPublic | BindingFlags.Instance);
+                            handlerProp.SetValue(newAction, actionHandler);
+
+                            actionHandler.Actions.Add(newAction);
                         }
 
-                        woodyInstance.AddComponent<DynamicSpriteSorter>();
+                        actor.SetCurrentRoom(originalWoody.CurrentRoom);
 
-                        LevelRoom room = null;
-
-                        if (LogicController.HasInstance)
-                        {
-                            room = LogicController.Instance.GetRoomByName(playerPosition.Room);
-                        }
-
+                        LevelRoom room = originalWoody.CurrentRoom;
                         if (woodyInstance.gameObject.GetComponent<GameEntity>() is GameEntity gameEntity && room != null)
                         {
                             gameEntity.SetCurrentRoom(room);
-                            woodyInstance.gameObject.transform.localPosition = new Vector3(playerPosition.Position.X, playerPosition.Position.Y, 0);
-                            GetPlayerManager.Players[playerPosition.SenderID].Woody = woodyInstance.gameObject;
+                            woodyInstance.gameObject.transform.localPosition = new Vector3(originalWoody.transform.localPosition.x, originalWoody.transform.localPosition.y, 0);
+
+                            if (LogicController.Instance.TheTriggerHandler is TriggerHandler triggerHandler)
+                            {
+                                LogicController.Instance.InitializeLevel(LogicController.Instance.CurrentLevel);
+                            }
+                            else
+                            {
+                                Log.Info($"Failed to get trigger handler..");
+                            }
+
                             LogicController.Instance.AddEntityToWorld(gameEntity, room);
+
+                            LogicController.Instance.GetAllPortals(true);
+                            LogicController.Instance.GetAllItems(true);
+                            LogicController.Instance.GetAllContainers(true);
+                            LogicController.Instance.GetAllActors(true);
+                            LogicController.Instance.GetAllActorBrains(true);
                         }
                         else
                         {
-                            //Log.Info($"Failed to get Room: {room == null} or Entity: {woodyInstance.GetComponent<GameEntity>() == null}");
+                            Log.Info($"Failed to get Room: {room == null} or Entity: {woodyInstance.GetComponent<GameEntity>() == null}");
                         }
+
+                        var neighbour = LogicController.Instance.GetAllActorBrains().FirstOrDefault(x => x.IsNeighbor);
+                        var woody = LogicController.Instance.GetAllActorBrains().FirstOrDefault(x => x.IsWoody);
+
+                        Log.Info($"Successfully added new test woody!");
+
+                        entity.SetCurrentRoom(room);
+                        woodyInstance.gameObject.transform.localPosition = new Vector3(playerPosition.Position.X, playerPosition.Position.Y, 0);
+                        GetPlayerManager.Players[playerPosition.SenderID].Woody = woodyInstance.gameObject;
+                        LogicController.Instance.AddEntityToWorld(entity, room);
                     }
                     else
                     {
@@ -117,7 +161,7 @@ namespace NfhcModel.Network.ClientModul.ClientProcessors
 
                         var woodyMovement = theWoody.GetComponent<WoodyMovement>();
                         var spriteAnimPlayer = theWoody.GetComponentInChildren<SpriteAnimPlayer>();
-                        
+
                         woodyActor.PlayAnimFromTime(woodyActor.GetAnimByName(playerPosition.Animation), playerPosition.AnimTime);
 
                         theWoody.transform.localPosition =
@@ -137,5 +181,6 @@ namespace NfhcModel.Network.ClientModul.ClientProcessors
                 GetClient.client.SendToAll(writer, DeliveryMethod.ReliableOrdered);
             }
         }
+
     }
 }
