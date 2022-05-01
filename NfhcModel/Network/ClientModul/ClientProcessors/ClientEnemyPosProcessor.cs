@@ -8,6 +8,7 @@ using NfhcModel.Network.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -21,6 +22,8 @@ namespace NfhcModel.Network.ClientModul.ClientProcessors
         public new Queue<EnemyPosition> OutgoingMessages { get; set; } = new Queue<EnemyPosition>();
 
         private ActorBrain neighbor;
+
+        public override MessageTypes MessageType { get { return MessageTypes.EnemyTransform; } }
 
         public ClientEnemyPosProcessor()
         {
@@ -69,7 +72,17 @@ namespace NfhcModel.Network.ClientModul.ClientProcessors
                             gameEntity.PlayAnimFromTime(gameEntity.GetAnimByName(enemyPosition.Animation), enemyPosition.AnimTime);
                         }
 
+                        if (neighbor?.GetBrainScript() is BrainScriptBase brainScript)
+                        {
+                            MethodInfo dynMethod = brainScript.GetType().GetMethod(enemyPosition.CurrentTask, BindingFlags.NonPublic | BindingFlags.Instance);
 
+                            BrainScriptBase.State method = Delegate.CreateDelegate(typeof(BrainScriptBase.State), brainScript, dynMethod) as BrainScriptBase.State;
+                            brainScript.EnterIdleState();
+                            neighbor.StopAllJobs();
+                            brainScript.Stop(neighbor);
+                            brainScript.SetState(method);
+                            brainScript.Run(neighbor);
+                        }
                     }
                     else if(GameObject.FindObjectsOfType<ActorBrain>().FirstOrDefault(x => x.IsNeighbor) is ActorBrain enemy)
                     {
@@ -77,7 +90,6 @@ namespace NfhcModel.Network.ClientModul.ClientProcessors
                         neighbor?.StopAllJobs();
                     }
                 }
-
             }
 
             while (OutgoingMessages.Any())

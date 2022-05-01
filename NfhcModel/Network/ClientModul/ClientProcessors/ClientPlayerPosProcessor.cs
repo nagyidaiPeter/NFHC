@@ -20,6 +20,8 @@ namespace NfhcModel.Network.ClientModul.ClientProcessors
 
         public new Queue<PlayerPosition> OutgoingMessages { get; set; } = new Queue<PlayerPosition>();
 
+        public override MessageTypes MessageType { get { return MessageTypes.PlayerTransform; } }
+
         public ClientPlayerPosProcessor()
         {
 
@@ -89,6 +91,7 @@ namespace NfhcModel.Network.ClientModul.ClientProcessors
                             gameEntity.SetCurrentRoom(room);
                             woodyInstance.gameObject.transform.localPosition = new Vector3(playerPosition.Position.X, playerPosition.Position.Y, 0);
                             GetPlayerManager.Players[playerPosition.SenderID].Woody = woodyInstance.gameObject;
+                            LogicController.Instance.AddEntityToWorld(gameEntity, room);
                         }
                         else
                         {

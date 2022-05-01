@@ -17,6 +17,7 @@ namespace NfhcModel.Network.ServerModul.ServerProcessors
 
         public new Queue<PlayerDataMessage> OutgoingMessages { get; set; } = new Queue<PlayerDataMessage>();
 
+        public override MessageTypes MessageType { get { return MessageTypes.PlayerDataMessage; } }
 
         public ServerPlayerDataProcessor()
         {

@@ -20,6 +20,8 @@ namespace NfhcModel.Network.ClientModul.ClientProcessors
 
         public new Queue<GameEntityMessage> OutgoingMessages { get; set; } = new Queue<GameEntityMessage>();
 
+        public override MessageTypes MessageType { get { return MessageTypes.GameEntityMessage; } }
+
         public ClientGameEntityProcessor()
         {
 

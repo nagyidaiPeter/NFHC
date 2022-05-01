@@ -15,6 +15,9 @@ namespace NfhcModel.Network.ServerModul.ServerProcessors
 
         public new Queue<SceneLoadingSync> OutgoingMessages { get; set; } = new Queue<SceneLoadingSync>();
 
+        public override MessageTypes MessageType { get { return MessageTypes.SceneLoadingSync; } }
+
+
         public ServerSceneSyncProcessor()
         {
 

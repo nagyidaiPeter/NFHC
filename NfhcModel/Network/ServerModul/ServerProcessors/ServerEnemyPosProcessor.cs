@@ -17,6 +17,8 @@ namespace NfhcModel.Network.ServerModul.ServerProcessors
 
         public new Queue<EnemyPosition> OutgoingMessages { get; set; } = new Queue<EnemyPosition>();
 
+        public override MessageTypes MessageType { get { return MessageTypes.EnemyTransform; } }
+
 
         public ServerEnemyPosProcessor()
         {
@@ -48,9 +50,9 @@ namespace NfhcModel.Network.ServerModul.ServerProcessors
         {
             while (IncomingMessages.Any())
             {
-                EnemyPosition playerData = IncomingMessages.Dequeue();
+                EnemyPosition enemyData = IncomingMessages.Dequeue();
 
-                var msg = BaseMessageType.Serialize(playerData);
+                var msg = BaseMessageType.Serialize(enemyData);
 
                 NetDataWriter writer = new NetDataWriter();
                 writer.Put(msg);
@@ -59,8 +61,8 @@ namespace NfhcModel.Network.ServerModul.ServerProcessors
 
             while (OutgoingMessages.Any())
             {
-                EnemyPosition playerData = OutgoingMessages.Dequeue();
-                var msg = BaseMessageType.Serialize(playerData);
+                EnemyPosition enemyData = OutgoingMessages.Dequeue();
+                var msg = BaseMessageType.Serialize(enemyData);
 
                 NetDataWriter writer = new NetDataWriter();
                 writer.Put(msg);

@@ -15,6 +15,8 @@ namespace NfhcModel.Network.ServerModul.ServerProcessors
 
         public new Queue<LevelDetailsSync> OutgoingMessages { get; set; } = new Queue<LevelDetailsSync>();
 
+        public override MessageTypes MessageType { get { return MessageTypes.LevelDetailsSync; } }
+
         public ServerLevelDetailsSyncProcessor()
         {
 

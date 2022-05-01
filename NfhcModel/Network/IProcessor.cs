@@ -13,11 +13,14 @@ namespace NfhcModel.Network
         Queue<BaseMessageType> IncomingMessages { get; set; }
 
         Queue<BaseMessageType> OutgoingMessages { get; set; }
+        
+        MessageTypes MessageType { get; }
 
         bool AddMessage(byte[] message, DataStructures.PlayerData player);
 
         bool SendMessage(object message, DataStructures.PlayerData player);
 
         void Process();
+
     }
 }

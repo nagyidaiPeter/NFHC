@@ -18,6 +18,9 @@ namespace NfhcModel.Network.ClientModul.ClientProcessors
 
         public new Queue<ChatMessage> OutgoingMessages { get; set; } = new Queue<ChatMessage>();
 
+        public override MessageTypes MessageType { get { return MessageTypes.Chat; } }
+
+
         public ClientChatProcessor()
         {
             

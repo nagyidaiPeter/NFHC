@@ -50,6 +50,8 @@ namespace NfhcModel.Network
             }
         }
 
+        public virtual MessageTypes MessageType => throw new NotImplementedException();
+
         public virtual bool AddMessage(byte[] message, DataStructures.PlayerData player)
         {
             throw new NotImplementedException();

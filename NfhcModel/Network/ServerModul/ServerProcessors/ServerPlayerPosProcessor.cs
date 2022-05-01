@@ -17,6 +17,7 @@ namespace NfhcModel.Network.ServerModul.ServerProcessors
 
         public new Queue<PlayerPosition> OutgoingMessages { get; set; } = new Queue<PlayerPosition>();
 
+        public override MessageTypes MessageType { get { return MessageTypes.PlayerTransform; } }
 
         public ServerPlayerPosProcessor()
         {
