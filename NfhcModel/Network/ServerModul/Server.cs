@@ -1,5 +1,6 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
+using NfhcModel.Core;
 using NfhcModel.DataStructures;
 using NfhcModel.Logger;
 using NfhcModel.Network.Messages;
@@ -26,19 +27,26 @@ namespace NfhcModel.Network.ServerModul
         private PlayerManager playerManager;
         private ServerConfig serverConfig;
 
-        public Server(ServerConfig serverConfig, PlayerManager playerManager, ServerChatProcessor chatProcessor,
-            ServerPlayerDataProcessor playerDataProcessor, ServerSceneSyncProcessor serverSceneSync,
-            ServerPlayerPosProcessor serverPlayerPos, ServerEnemyPosProcessor enemyPosProcessor, ServerGameEntityProcessor gameEntityProcessor)
+        public Server(ServerConfig serverConfig, PlayerManager playerManager)
         {
             this.serverConfig = serverConfig;
             this.playerManager = playerManager;
 
-            MessageProcessors.Add(MessageTypes.Chat, chatProcessor);
-            MessageProcessors.Add(MessageTypes.PlayerDataMessage, playerDataProcessor);
-            MessageProcessors.Add(MessageTypes.SceneLoadingSync, serverSceneSync);
-            MessageProcessors.Add(MessageTypes.PlayerTransform, serverPlayerPos);
-            MessageProcessors.Add(MessageTypes.EnemyTransform, enemyPosProcessor);
-            MessageProcessors.Add(MessageTypes.GameEntityMessage, gameEntityProcessor);
+            //Get all server message processors filtered with namespace
+            Type[] processors = typeof(IProcessor).Assembly.GetTypes()
+              .Where(t => t.Namespace != null)
+              .Where(t => t.Namespace.StartsWith("NfhcModel.Network.ServerModul.ServerProcessors", StringComparison.Ordinal))
+              .Where(t => t.IsSubclassOf(typeof(BaseProcessor)))
+              .Where(t => !t.IsAbstract)
+              .ToArray();
+
+            foreach (var proc in processors)
+            {
+                if (NfhcServiceLocator.LocateService(proc) is IProcessor resolvedProc)
+                {
+                    MessageProcessors.Add(resolvedProc.MessageType, resolvedProc);
+                }
+            }
 
             EventBasedNetListener listener = new EventBasedNetListener();
             server = new NetManager(listener);

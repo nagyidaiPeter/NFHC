@@ -24,5 +24,7 @@ namespace NfhcModel.DataStructures
 		public string Room;
 
 		public string Animation;
+
+		public string CurrentTask;
 	}
 }

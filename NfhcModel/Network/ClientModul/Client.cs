@@ -1,6 +1,7 @@
 ﻿using LiteNetLib;
 using NFH.Game;
 using NFH.Game.Logic;
+using NfhcModel.Core;
 using NfhcModel.Logger;
 using NfhcModel.MonoBehaviours.Gui;
 using NfhcModel.Network.ClientModul.ClientProcessors;
@@ -34,19 +35,26 @@ namespace NfhcModel.Network.ClientModul
 
         public NetManager client;
         public EventBasedNetListener listener;
-        public Client(ClientConfig clientConfig, PlayerManager playerManager, ClientPlayerDataProcessor playerDataProcessor,
-            ClientChatProcessor clientChatProcessor, ClientSceneSyncProcessor clientSceneSync, ClientPlayerPosProcessor clientPlayerPos,
-            ClientEnemyPosProcessor enemyPosProcessor, ClientGameEntityProcessor gameEntityProcessor)
+        public Client(ClientConfig clientConfig, PlayerManager playerManager)
         {
             this.clientConfig = clientConfig;
             this.playerManager = playerManager;
-            MessageProcessors.Add(MessageTypes.PlayerDataMessage, playerDataProcessor);
-            MessageProcessors.Add(MessageTypes.Chat, clientChatProcessor);
-            MessageProcessors.Add(MessageTypes.SceneLoadingSync, clientSceneSync);
-            MessageProcessors.Add(MessageTypes.PlayerTransform, clientPlayerPos);
-            MessageProcessors.Add(MessageTypes.EnemyTransform, enemyPosProcessor);
-            MessageProcessors.Add(MessageTypes.GameEntityMessage, gameEntityProcessor);
 
+            //Get all server message processors filtered with namespace
+            Type[] processors = typeof(IProcessor).Assembly.GetTypes()
+              .Where(t => t.Namespace != null)
+              .Where(t => t.Namespace.StartsWith("NfhcModel.Network.ClientModul.ClientProcessors", StringComparison.Ordinal))
+              .Where(t => t.IsSubclassOf(typeof(BaseProcessor)))
+              .Where(t => !t.IsAbstract)
+              .ToArray();
+
+            foreach (var proc in processors)
+            {
+                if (NfhcServiceLocator.LocateService(proc) is IProcessor resolvedProc)
+                {
+                    MessageProcessors.Add(resolvedProc.MessageType, resolvedProc);
+                }
+            }
         }
 
         public IEnumerator RunClient()

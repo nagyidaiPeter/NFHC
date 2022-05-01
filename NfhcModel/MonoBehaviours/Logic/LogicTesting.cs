@@ -1,19 +1,41 @@
-﻿using NFH.Game;
+﻿
+using NFH.DevTools;
+using NFH.Game;
 using NFH.Game.Logic;
 using NfhcModel.Logger;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace NfhcModel.MonoBehaviours
 {
+
     public class LogicTesting : MonoBehaviour
     {
         private ActorBrain woody, neighbour;
 
+        public delegate void CustomAction(ActorBrain brain);
+        GameObject woodyInstance;
+        bool triggered = false;
+
+        void Start()
+        {
+            SceneManager.sceneLoaded += (scene, mode) =>
+            {
+                Log.Info($"Scene loaded instance: {LogicController.HasInstance}");
+                triggered = false;
+                if (LogicController.HasInstance)
+                {
+                    LogicController.Instance.OnLevelWasInitialized += (level) => {
+                        Log.Info($"Set lives to 1");
+                        LogicController.Instance.TheGameScore.LivesCount = 1;
+                        LogicController.Instance.TheGameScore.UnPauseNotifications(true);
+                    };                   
+                }
+            };
+        }
 
         private void GetAllChild(Transform parent)
         {
@@ -28,88 +50,208 @@ namespace NfhcModel.MonoBehaviours
             }
         }
 
+
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.L))
+            if (Input.GetKeyDown(KeyCode.Z))
             {
-                woody = GameObject.FindObjectsOfType<ActorBrain>().FirstOrDefault(x => x.IsWoody);
+                neighbour = GameObject.FindObjectsOfType<ActorBrain>().FirstOrDefault(x => x.IsNeighbor);
 
-                if (woody != null)
+                if (neighbour != null)
                 {
-                    Log.Info("Woody comps:");
-                    foreach (var comp in woody.gameObject.GetComponents<Component>())
-                    {
-                        Log.Info($"\tComp: {comp.GetType()}");
-                    }
+                    Log.Info("Neighbour change task!");
 
-                    Log.Info("Woody childs:");
-                    GetAllChild(woody.transform);
+                    //neighbour.HandleTriggerCommand();
 
+                    var brainScript = neighbour.GetBrainScript();
+                    var brainState = brainScript.GetState();
+                    var stateInfo = brainScript.GetStateInfo();
 
 
-                    neighbour = GameObject.FindObjectsOfType<ActorBrain>().FirstOrDefault(x => x.IsNeighbor);
+                    Log.Info($"BEFORE State: {brainState.Method.Name} StateInfo: {stateInfo}");
+                    MethodInfo dynMethod = brainScript.GetType().GetMethod("GoToBeerState", BindingFlags.NonPublic | BindingFlags.Instance);
 
-                    if (neighbour != null)
-                    {
-                        Log.Info("Neighbour comps:");
-                        foreach (var comp in neighbour.gameObject.GetComponents<Component>())
-                        {
-                            Log.Info($"Comp: {comp.GetType()}");
-                        }
+                    BrainScriptBase.State method = Delegate.CreateDelegate(typeof(BrainScriptBase.State), brainScript, dynMethod) as BrainScriptBase.State;
+                    Log.Info($"Created delegate..");
+                    brainScript.EnterIdleState();
+                    neighbour.StopAllJobs();
+                    brainScript.Stop(neighbour);
+                    brainScript.SetState(method);
+                    brainScript.Run(neighbour);
 
-                        Log.Info("Neighbour childs:");
-                        GetAllChild(woody.transform);
-                    }
+                    Log.Info($"State: {brainState.ToString()} - {brainState.Method.Name} StateInfo: {stateInfo}");
                 }
             }
 
-
             if (Input.GetKeyDown(KeyCode.J))
             {
-                foreach (var handler in GameObject.FindObjectsOfType<EntityActionHandler>())
+                neighbour = GameObject.FindObjectsOfType<ActorBrain>().FirstOrDefault(x => x.IsNeighbor);
+
+                if (neighbour != null)
                 {
-                    Log.Info($"\n{handler.gameObject.name}:");
-                    foreach (var action in handler.Actions)
-                    {
-                        Log.Info($"Action: {action.ActionName}");
-                    }
+                    Log.Info("Neighbour change task!");
+
+                    //neighbour.HandleTriggerCommand();
+
+                    var brainScript = neighbour.GetBrainScript();
+                    var brainState = brainScript.GetState();
+                    var stateInfo = brainScript.GetStateInfo();
+
+                    Log.Info($"BEFORE State: {brainState.Method.Name} StateInfo: {stateInfo}");
+                    MethodInfo dynMethod = brainScript.GetType().GetMethod("GoToSofaState", BindingFlags.NonPublic | BindingFlags.Instance);
+
+                    BrainScriptBase.State method = Delegate.CreateDelegate(typeof(BrainScriptBase.State), brainScript, dynMethod) as BrainScriptBase.State;
+                    Log.Info($"Created delegate..");
+                    brainScript.EnterIdleState();
+                    neighbour.StopAllJobs();
+                    brainScript.Stop(neighbour);
+                    brainScript.SetState(method);
+                    brainScript.Run(neighbour);
+
+                    Log.Info($"State: {brainState.ToString()} - {brainState.Method.Name} StateInfo: {stateInfo}");
+                }
+            }
+
+            if (woodyInstance != null && !triggered)
+            {
+                if (woodyInstance.GetComponent<ActorBrain>().CurrentRoom == neighbour.CurrentRoom)
+                {
+                    //FightCommand cmd = FightCommand.Create("fight", woodyInstance.GetComponent<Actor>(), TriggerFlag.InSameRoom);
+                    //neighbour.HandleTriggerCommand(cmd);
+                    //FightJob job = FightJob.Create(woodyInstance.GetComponent<ActorBrain>());
+                    //neighbour.AddJob(job);
+
+                    SetupDieCommands();
+                    triggered = true;
                 }
             }
 
             if (Input.GetKeyDown(KeyCode.K))
             {
-                foreach (var entity in GameObject.FindObjectsOfType<GameEntity>())
+                ActorBrain originalWoody = GameObject.FindObjectsOfType<ActorBrain>().FirstOrDefault(x => x.IsWoody);
+
+                woodyInstance = Instantiate(originalWoody.gameObject, originalWoody.transform.parent);//new GameObject("woody");
+                woodyInstance.transform.parent = originalWoody.transform.parent;
+                woodyInstance.name = "Woody-Clone";
+
+                var oldActionHandler = originalWoody.GetComponent<EntityActionHandler>();
+
+                var actor = woodyInstance.GetComponent<Actor>();
+                var actorBrain = woodyInstance.GetComponent<ActorBrain>();
+                var actionHandler = woodyInstance.GetComponent<EntityActionHandler>();
+                var entity = woodyInstance.GetComponent<GameEntity>();
+
+                var brainProp = actor.GetType().GetField("_brain", BindingFlags.NonPublic | BindingFlags.Instance);
+                brainProp.SetValue(actor, actorBrain);
+
+                entity.WorldObjectName = woodyInstance.name;
+
+                Log.Info($"Old ID: {originalWoody.gameObject.GetInstanceID()} newID: {actorBrain.gameObject.GetInstanceID()}");
+
+                var prop = actionHandler.GetType().GetField("_entity", BindingFlags.NonPublic | BindingFlags.Instance);
+                prop.SetValue(actionHandler, entity);
+
+                foreach (var action in oldActionHandler.Actions)
                 {
-                    Log.Info($"\nEnity: {entity.WorldObjectName}");
-
-                    Log.Info($"Comps:");
-                    foreach (var comp in entity.gameObject.GetComponents<Component>())
-                    {
-                        Log.Info($"\tComp: {comp.GetType()}");
-                    }
-
-                    Log.Info($"Childs:");
-                    foreach (Transform child in entity.transform)
-                    {
-                        Log.Info($"\tChild: {child.name}");
-                        Log.Info($"\t\tChild Comps:");
-                        foreach (var comp in child.gameObject.GetComponents<Component>())
-                        {
-                            Log.Info($"\t\t\tComp: {comp.GetType()}");
-                        }
-                    }
-
-                    Log.Info($"Inventory:");
-                    if (entity.Inventory != null && !entity.Inventory.IsEmpty)
-                    {
-                        foreach (var item in entity.Inventory.ItemSlots)
-                        {
-                            Log.Info($"\tInv: {item._item.name}");
-                        }
-                    }
+                    Log.Info($"Action: {action?.ActionName} Actor: {action?.ActorName} ActorBrain: {action?.ActorBrain?.name} BehavActor: {action.BehaviorActorBrain}");
                 }
 
+                actionHandler.Actions.Clear();
+                Log.Info($"Actions on new woody: {actionHandler.Actions.Count} Actions on old woody: {oldActionHandler.Actions.Count}");
+
+                Log.Info($"----------------***Adding actions***----------------");
+
+                foreach (var action in oldActionHandler.Actions)
+                {
+                    EntityAction newAction = new EntityAction(action.ActionName);
+
+                    action.CopyFieldsTo(newAction);
+
+                    Log.Info($"Action: {newAction?.ActionName} Actor: {newAction?.ActorName} ActorBrain: {newAction?.ActorBrain?.name} BehavActor: {newAction.BehaviorActorBrain}");
+
+                    if (newAction.ActorName == "woody")
+                    {
+                        var nameProp = newAction.GetType().GetField("_actorName", BindingFlags.NonPublic | BindingFlags.Instance);
+                        nameProp.SetValue(newAction, woodyInstance.name);
+                    }
+
+                    if (newAction.ActorBrain == originalWoody.gameObject.GetComponent<ActorBrain>())
+                    {
+                        newAction.ActorBrain = actorBrain;
+                    }
+
+                    var handlerProp = newAction.GetType().GetField("_handler", BindingFlags.NonPublic | BindingFlags.Instance);
+                    handlerProp.SetValue(newAction, actionHandler);
+
+                    actionHandler.Actions.Add(newAction);
+                }
+                Log.Info($"----------------***Done***----------------");
+
+                actor.SetCurrentRoom(originalWoody.CurrentRoom);
+
+                LevelRoom room = originalWoody.CurrentRoom;
+                if (woodyInstance.gameObject.GetComponent<GameEntity>() is GameEntity gameEntity && room != null)
+                {
+                    gameEntity.SetCurrentRoom(room);
+                    woodyInstance.gameObject.transform.localPosition = new Vector3(originalWoody.transform.localPosition.x, originalWoody.transform.localPosition.y, 0);
+
+                    if (LogicController.Instance.TheTriggerHandler is TriggerHandler triggerHandler)
+                    {
+                        LogicController.Instance.InitializeLevel(LogicController.Instance.CurrentLevel);
+                        triggerHandler.gameObject.SetActive(false);
+                        triggerHandler.gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        Log.Info($"Failed to get trigger handler..");
+                    }
+
+                    LogicController.Instance.AddEntityToWorld(gameEntity, room);
+
+                    LogicController.Instance.GetAllPortals(true);
+                    LogicController.Instance.GetAllItems(true);
+                    LogicController.Instance.GetAllContainers(true);
+                    LogicController.Instance.GetAllActors(true);
+                    LogicController.Instance.GetAllActorBrains(true);
+                }
+                else
+                {
+                    Log.Info($"Failed to get Room: {room == null} or Entity: {woodyInstance.GetComponent<GameEntity>() == null}");
+                }
+
+                neighbour = LogicController.Instance.GetAllActorBrains().FirstOrDefault(x => x.IsNeighbor);
+                woody = LogicController.Instance.GetAllActorBrains().FirstOrDefault(x => x.IsWoody);
+
+                try
+                {
+                    SetupDieCommands();
+
+                    foreach (var action in actionHandler.Actions)
+                    {
+                        Log.Info($"Action: {action?.ActionName} Actor: {action?.ActorName} ActorBrain: {action?.ActorBrain?.name}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Info(ex);
+                }
+
+                Log.Info($"Successfully added new test woody!");
             }
+        }
+
+        private void SetupDieCommands()
+        {
+            FightCommand cmd = FightCommand.Create("fight", woodyInstance.GetComponent<Actor>(), TriggerFlag.InSameRoom);
+            neighbour.HandleTriggerCommand(cmd);
+
+            DieCommand dieCmd = DieCommand.Create("die", neighbour.GetComponent<Actor>(), TriggerFlag.InSameRoom);
+            woodyInstance.GetComponent<ActorBrain>().HandleTriggerCommand(dieCmd);
+
+            woodyInstance.GetComponent<EntityActionHandler>().SetRuntimeReferencesForActions();
+            neighbour.GetComponent<EntityActionHandler>().SetRuntimeReferencesForActions();
+
+            Log.Info("Fight-Die commands issued!");
         }
     }
 }
