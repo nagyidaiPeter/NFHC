@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NfhcBootloader
+namespace NfhBootloader
 {
     public static class Main
     {
@@ -43,15 +43,13 @@ namespace NfhcBootloader
                     {
                         // Delete the path so that the launcher should be used to launch Nitrox
                         File.Delete(nfhcLauncherPathFile);
-                    }
-                    catch (Exception ex)
+                    } catch (Exception ex)
                     {
                         Console.WriteLine($"Unable to delete the launcherpath.txt file. Nfhc will launch again without launcher. Error:{Environment.NewLine}{ex}");
                     }
                 });
                 return Directory.Exists(valueInFile) ? valueInFile : null;
-            }
-            catch
+            } catch
             {
                 // ignored
             }
@@ -70,9 +68,47 @@ namespace NfhcBootloader
 
         private static void BootstrapNfhc()
         {
-            Assembly core = Assembly.Load(new AssemblyName("NfhcModel"));
-            Type mainType = core.GetType("NfhcModel.Main");
-            mainType.InvokeMember("Execute", BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod, null, null, null);
+            //Write a log file to the same directory as the launcher to help with debugging.
+            string logPath = Path.Combine("E:\\SteamLibrary\\steamapps\\common\\Neighbours back From Hell\\NFHC Logs", "NfhcBootloader.log");
+            using (StreamWriter writer = new StreamWriter(logPath, false))
+            {
+                writer.WriteLine($"NFHC Bootloader version {Assembly.GetExecutingAssembly().GetName().Version} built on {File.GetCreationTimeUtc(Assembly.GetExecutingAssembly().Location)}");
+                writer.WriteLine($"NFHC Launcher directory: {nfhcLauncherDir.Value}");
+                writer.WriteLine("NFHC_LAUNCHER_PATH:" + Environment.GetEnvironmentVariable("NFHC_LAUNCHER_PATH") ?? "NFHC_LAUNCHER_PATH not set");
+
+                Assembly core;
+                try
+                {
+                    core = Assembly.Load(new AssemblyName("NfhcModel"));
+                } catch (Exception ex)
+                {
+                    writer.WriteLine($"Failed to load NfhcModel assembly. Error:{Environment.NewLine}{ex}");
+                    return;
+                }
+
+                writer.WriteLine("NfhcModel assembly loaded.");
+                Type mainType;
+                try
+                {
+                    mainType = core.GetType("NfhcModel.Main");
+                } catch (Exception ex)
+                {
+                    writer.WriteLine($"Failed to get NfhcModel.Main type. Error:{Environment.NewLine}{ex}");
+                    return;
+                }
+
+
+                try
+                {
+                    mainType.InvokeMember("Execute", BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod, null, null, null);
+
+                } catch (Exception ex)
+                {
+                    writer.WriteLine($"Failed to invoke NfhcModel.Main.Execute. Error:{Environment.NewLine}{ex}");
+                    return;
+                }
+            }
+
         }
 
         private static Assembly CurrentDomainOnAssemblyResolve(object sender, ResolveEventArgs args)

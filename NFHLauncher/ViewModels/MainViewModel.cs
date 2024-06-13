@@ -5,14 +5,8 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
 
 
 namespace NfhcLauncher.ViewModels
@@ -62,10 +56,16 @@ namespace NfhcLauncher.ViewModels
             Patch = new RelayCommand(o => 
             {
                 // TODO: The launcher should override FileRead win32 API for the NBFH process to give it the modified Assembly-CSharp from memory 
-                string bootloaderName = "NfhcBootloader.dll";
+                string bootloaderName = "NFHBootloader.dll";
                 try
                 {
-                    File.Copy(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), bootloaderName), Path.Combine(installPath, "Neighbours back From Hell_Data", "Managed", bootloaderName), true);
+                    var source = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), bootloaderName);
+                    var target = Path.Combine(installPath, "Neighbours back From Hell_Data", "Managed", bootloaderName);
+
+                    var sourceFound = File.Exists(source);
+                    var targetFound = File.Exists(target);
+
+                    File.Copy(source, target, true);
                 }
                 catch (IOException ex)
                 {

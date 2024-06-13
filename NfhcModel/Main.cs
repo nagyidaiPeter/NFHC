@@ -5,15 +5,11 @@ using NfhcModel.DataStructures;
 using NfhcModel.Logger;
 using NfhcModel.Modules;
 using NfhcModel.MonoBehaviours;
-using NfhcModel.MonoBehaviours.Gui.MainMenu;
 using NfhcModel.Patches;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace NfhcModel

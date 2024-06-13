@@ -1,0 +1,190 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{86BD7A75-7E77-4B81-B239-7FB17766F4F5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NfhcModel</RootNamespace>
+    <AssemblyName>NfhcModel</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>E:\SteamLibrary\steamapps\common\Neighbours back From Hell\Neighbours back From Hell_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>E:\SteamLibrary\steamapps\common\Neighbours back From Hell\Neighbours back From Hell_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>E:\SteamLibrary\steamapps\common\Neighbours back From Hell\Neighbours back From Hell_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>E:\SteamLibrary\steamapps\common\Neighbours back From Hell\Neighbours back From Hell_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>E:\SteamLibrary\steamapps\common\Neighbours back From Hell\Neighbours back From Hell_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>E:\SteamLibrary\steamapps\common\Neighbours back From Hell\Neighbours back From Hell_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>E:\SteamLibrary\steamapps\common\Neighbours back From Hell\Neighbours back From Hell_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputModule">
+      <HintPath>E:\SteamLibrary\steamapps\common\Neighbours back From Hell\Neighbours back From Hell_Data\Managed\UnityEngine.InputModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>E:\SteamLibrary\steamapps\common\Neighbours back From Hell\Neighbours back From Hell_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>E:\SteamLibrary\steamapps\common\Neighbours back From Hell\Neighbours back From Hell_Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>E:\SteamLibrary\steamapps\common\Neighbours back From Hell\Neighbours back From Hell_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Core\ClientAutoFacRegistrar.cs" />
+    <Compile Include="Core\IAutoFacRegistrar.cs" />
+    <Compile Include="Core\NfhcServiceLocator.cs" />
+    <Compile Include="Core\ServerAutoFacRegistrar.cs" />
+    <Compile Include="DataStructures\NpcData.cs" />
+    <Compile Include="DataStructures\Optional.cs" />
+    <Compile Include="DataStructures\PlayerData.cs" />
+    <Compile Include="DataStructures\Validate.cs" />
+    <Compile Include="Debuggers\BaseDebugger.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Helpers\NfhcAppData.cs" />
+    <Compile Include="Helpers\NfhcProtobufSerializer.cs" />
+    <Compile Include="Logger\InGameLogger.cs" />
+    <Compile Include="Logger\Log.cs" />
+    <Compile Include="Main.cs" />
+    <Compile Include="Modules\NfhcPatchesModule.cs" />
+    <Compile Include="MonoBehaviours\Gui\ChatHandler.cs" />
+    <Compile Include="MonoBehaviours\Gui\MainMenu\MainMenuMods.cs" />
+    <Compile Include="MonoBehaviours\Gui\UiTimer.cs" />
+    <Compile Include="MonoBehaviours\Logic\LogicTesting.cs" />
+    <Compile Include="MonoBehaviours\Multiplayer.cs" />
+    <Compile Include="MonoBehaviours\NfhcBootstrapper.cs" />
+    <Compile Include="MonoBehaviours\SceneSyncer.cs" />
+    <Compile Include="Network\BaseProcessor.cs" />
+    <Compile Include="Network\ClientModul\Client.cs" />
+    <Compile Include="Network\ClientModul\ClientConfig.cs" />
+    <Compile Include="Network\ClientModul\ClientProcessors\ClientChatProcessor.cs" />
+    <Compile Include="Network\ClientModul\ClientProcessors\ClientEnemyPosProcessor.cs" />
+    <Compile Include="Network\ClientModul\ClientProcessors\ClientGameEntityProcessor.cs" />
+    <Compile Include="Network\ClientModul\ClientProcessors\ClientLevelDetailsSyncProcessor.cs" />
+    <Compile Include="Network\ClientModul\ClientProcessors\ClientPlayerDataProcessor.cs" />
+    <Compile Include="Network\ClientModul\ClientProcessors\ClientPlayerPosProcessor.cs" />
+    <Compile Include="Network\ClientModul\ClientProcessors\ClientSceneSyncProcessor.cs" />
+    <Compile Include="Network\IProcessor.cs" />
+    <Compile Include="Network\Messages\BaseMessageType.cs" />
+    <Compile Include="Network\Messages\ChatMessage.cs" />
+    <Compile Include="Network\Messages\EnemyPosition.cs" />
+    <Compile Include="Network\Messages\GameEntityMessage.cs" />
+    <Compile Include="Network\Messages\LevelDetailsSync.cs" />
+    <Compile Include="Network\Messages\PlayerDataMessage.cs" />
+    <Compile Include="Network\Messages\PlayerPosition.cs" />
+    <Compile Include="Network\Messages\SceneLoadingSync.cs" />
+    <Compile Include="Network\PlayerManager.cs" />
+    <Compile Include="Network\ServerModul\Server.cs" />
+    <Compile Include="Network\ServerModul\ServerConfig.cs" />
+    <Compile Include="Network\ServerModul\ServerProcessors\ServerChatProcessor.cs" />
+    <Compile Include="Network\ServerModul\ServerProcessors\ServerEnemyPosProcessor.cs" />
+    <Compile Include="Network\ServerModul\ServerProcessors\ServerGameEntityProcessor.cs" />
+    <Compile Include="Network\ServerModul\ServerProcessors\ServerLevelDetailsSyncProcessor.cs" />
+    <Compile Include="Network\ServerModul\ServerProcessors\ServerPlayerDataProcessor.cs" />
+    <Compile Include="Network\ServerModul\ServerProcessors\ServerPlayerPosProcessor.cs" />
+    <Compile Include="Network\ServerModul\ServerProcessors\ServerSceneSyncProcessor.cs" />
+    <Compile Include="Patches\IDynamicPatch.cs" />
+    <Compile Include="Patches\INfhcPatch.cs" />
+    <Compile Include="Patches\IPersistentPatch.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Unity\Helper\AssetBundleLoader.cs" />
+    <Compile Include="Unity\Helper\DebugUtils.cs" />
+    <Compile Include="Unity\Helper\GameObjectHelper.cs" />
+    <Compile Include="Unity\Helper\GUISkinUtils.cs" />
+    <Compile Include="Unity\Helper\MathUtil.cs" />
+    <Compile Include="Unity\Helper\RendererHelpers.cs" />
+    <Compile Include="Unity\Helper\StringUtils.cs" />
+    <Compile Include="Unity\Smoothing\ExosuitSmoothRotation.cs" />
+    <Compile Include="Unity\Smoothing\SmoothParameter.cs" />
+    <Compile Include="Unity\Smoothing\SmoothRotation.cs" />
+    <Compile Include="Unity\Smoothing\SmoothVector.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="StreamingAssets\chatcanvas" />
+    <None Include="StreamingAssets\chatkeyhint" />
+    <None Include="StreamingAssets\chatlog" />
+    <None Include="StreamingAssets\serverbrowser" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="DataStructures\ComponentNotes.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AsyncIO">
+      <Version>0.1.69</Version>
+    </PackageReference>
+    <PackageReference Include="Autofac">
+      <Version>4.9.4</Version>
+    </PackageReference>
+    <PackageReference Include="Lib.Harmony">
+      <Version>2.3.3</Version>
+    </PackageReference>
+    <PackageReference Include="LiteNetLib">
+      <Version>0.9.5.2</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces">
+      <Version>8.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="NaCl.Net">
+      <Version>0.1.13</Version>
+    </PackageReference>
+    <PackageReference Include="NLog">
+      <Version>5.3.2</Version>
+    </PackageReference>
+    <PackageReference Include="protobuf-net">
+      <Version>3.2.30</Version>
+    </PackageReference>
+    <PackageReference Include="System.Collections.Immutable">
+      <Version>8.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Diagnostics.DiagnosticSource">
+      <Version>8.0.1</Version>
+    </PackageReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

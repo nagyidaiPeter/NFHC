@@ -15,12 +15,12 @@ namespace NfhcLauncher.Patching
         //1 338 880
         public const string GAME_ASSEMBLY_NAME = "Assembly-CSharp.dll";
         public const string ORIGINAL_GAME_ASSEMBLY_NAME = "Assembly-CSharp-ORIGINAL.dll";
-        public const string PoCoopASSEMBLY_NAME = "NfhcBootloader.dll";
+        public const string PoCoopASSEMBLY_NAME = "NFHBootloader.dll";
         public const string GAME_ASSEMBLY_MODIFIED_NAME = "Assembly-CSharp-Nfhc.dll";
 
         private const string PoCoopENTRY_TYPE_NAME = "Main";
-        private const string PoCoopENTRY_METHOD_NAME = "Execute";
 
+        private const string PoCoopENTRY_METHOD_NAME = "Execute";
         private const string GAME_INPUT_TYPE_NAME = "NFH.Game.PlatformController";
         private const string GAME_INPUT_METHOD_NAME = "Awake";
 
@@ -63,7 +63,7 @@ namespace NfhcLauncher.Patching
 
                 Instruction callNfhcExecuteInstruction = OpCodes.Call.ToInstruction(executeMethodReference);
 
-                awakeMethod.Body.Instructions.Insert(0, callNfhcExecuteInstruction);
+                awakeMethod.Body.Instructions.Insert(1, callNfhcExecuteInstruction);
                 module.Write(modifiedAssemblyCSharp);
             }
 
