@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 291852132
+CRC: 2843294924
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: a2b2d37298084a6ca1c718d4347ed6f4
+    Hash: abab3f178dd311e9977b600b82cf656d
   TypeTreeHash:
     serializedVersion: 2
     Hash: ac4cc027597aeb0cbfefd1f7ffc4aa9a
@@ -64,4 +64,4 @@ ClassTypes:
 Assets:
 - Assets/chatlog/chatlog.unity
 Dependencies:
-- C:/Users/nagyi/source/repos/NFHC/Nfhc-UI/AssetBundles/chatcanvas
+- D:/Repos/NFHC/Nfhc-UI/AssetBundles/chatcanvas

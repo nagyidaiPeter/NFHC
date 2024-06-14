@@ -61,8 +61,7 @@ namespace NfhcModel
         private static void ApplyNfhcBehaviours()
         {
             Log.Info("Applying NFHC behaviours..");
-            GameObject nfhcRoot = new GameObject();
-            nfhcRoot.name = "Nfhc";
+            GameObject nfhcRoot = new GameObject("Nfhc");
             nfhcRoot.AddComponent<NfhcBootstrapper>();
             Log.Info("Behaviours applied.");
         }

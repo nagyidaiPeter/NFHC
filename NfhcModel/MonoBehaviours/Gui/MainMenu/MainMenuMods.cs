@@ -1,16 +1,8 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Resources;
-using LiteNetLib;
-using LiteNetLib.Utils;
-using NFH.Core;
-using NFH.DevTools;
-using NFH.Game;
-using NFH.Game.Logic;
 using NfhcModel.Core;
 using NfhcModel.Logger;
 using NfhcModel.Network;

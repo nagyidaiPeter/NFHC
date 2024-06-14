@@ -10,16 +10,17 @@ namespace NfhcModel.MonoBehaviours
         public void Awake()
         {
             DontDestroyOnLoad(gameObject);
+            Application.logMessageReceived += HandleLog;
+
+#if DEBUG
+            EnableDeveloperFeatures();
+#endif
 
             gameObject.AddComponent<LogicTesting>();
             gameObject.AddComponent<MainMenuMods>();
             gameObject.AddComponent<SceneSyncer>();
             gameObject.AddComponent<Multiplayer>();
 
-            Application.logMessageReceived += HandleLog;
-#if DEBUG
-            EnableDeveloperFeatures();
-#endif
         }
 
         private void HandleLog(string logString, string stackTrace, LogType type)

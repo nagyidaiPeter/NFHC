@@ -146,10 +146,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="StreamingAssets\chatcanvas" />
-    <None Include="StreamingAssets\chatkeyhint" />
-    <None Include="StreamingAssets\chatlog" />
-    <None Include="StreamingAssets\serverbrowser" />
+    <AdditionalFiles Include="StreamingAssets\chatcanvas">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AdditionalFiles>
+    <AdditionalFiles Include="StreamingAssets\chatkeyhint">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AdditionalFiles>
+    <AdditionalFiles Include="StreamingAssets\chatlog">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AdditionalFiles>
+    <AdditionalFiles Include="StreamingAssets\serverbrowser">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AdditionalFiles>
   </ItemGroup>
   <ItemGroup>
     <Content Include="DataStructures\ComponentNotes.txt" />
