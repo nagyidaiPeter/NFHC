@@ -6,8 +6,12 @@ using NfhcModel.Core;
 using NfhcModel.Logger;
 using NfhcModel.Network;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Xml;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -68,61 +72,31 @@ namespace NfhcModel.MonoBehaviours
         {
             if (Input.GetKeyDown(KeyCode.Z))
             {
-                neighbour = GameObject.FindObjectsOfType<ActorBrain>().FirstOrDefault(x => x.IsNeighbor);
+                string sceneName = SceneManager.GetActiveScene().name;
+                string filePath = Application.dataPath + "/" + sceneName + "_Hierarchy.xml";
 
-                if (neighbour != null)
+                using (XmlWriter writer = XmlWriter.Create(filePath, new XmlWriterSettings { Indent = true }))
                 {
-                    Log.Info("Neighbour change task!");
+                    writer.WriteStartDocument();
+                    writer.WriteStartElement("Scene");
+                    writer.WriteAttributeString("name", sceneName);
 
-                    //neighbour.HandleTriggerCommand();
+                    foreach (GameObject rootGameObject in SceneManager.GetActiveScene().GetRootGameObjects())
+                    {
+                        WriteGameObjectHierarchy(writer, rootGameObject);
+                    }
 
-                    var brainScript = neighbour.GetBrainScript();
-                    var brainState = brainScript.GetState();
-                    var stateInfo = brainScript.GetStateInfo();
-
-
-                    Log.Info($"BEFORE State: {brainState.Method.Name} StateInfo: {stateInfo}");
-                    MethodInfo dynMethod = brainScript.GetType().GetMethod("GoToBeerState", BindingFlags.NonPublic | BindingFlags.Instance);
-
-                    BrainScriptBase.State method = Delegate.CreateDelegate(typeof(BrainScriptBase.State), brainScript, dynMethod) as BrainScriptBase.State;
-                    Log.Info($"Created delegate..");
-                    brainScript.EnterIdleState();
-                    neighbour.StopAllJobs();
-                    brainScript.Stop(neighbour);
-                    brainScript.SetState(method);
-                    brainScript.Run(neighbour);
-
-                    Log.Info($"State: {brainState.ToString()} - {brainState.Method.Name} StateInfo: {stateInfo}");
+                    writer.WriteEndElement();
+                    writer.WriteEndDocument();
                 }
+
+                Debug.Log("Hierarchy saved to " + filePath);
             }
+
 
             if (Input.GetKeyDown(KeyCode.J))
             {
-                neighbour = GameObject.FindObjectsOfType<ActorBrain>().FirstOrDefault(x => x.IsNeighbor);
-
-                if (neighbour != null)
-                {
-                    Log.Info("Neighbour change task!");
-
-                    //neighbour.HandleTriggerCommand();
-
-                    var brainScript = neighbour.GetBrainScript();
-                    var brainState = brainScript.GetState();
-                    var stateInfo = brainScript.GetStateInfo();
-
-                    Log.Info($"BEFORE State: {brainState.Method.Name} StateInfo: {stateInfo}");
-                    MethodInfo dynMethod = brainScript.GetType().GetMethod("GoToSofaState", BindingFlags.NonPublic | BindingFlags.Instance);
-
-                    BrainScriptBase.State method = Delegate.CreateDelegate(typeof(BrainScriptBase.State), brainScript, dynMethod) as BrainScriptBase.State;
-                    Log.Info($"Created delegate..");
-                    brainScript.EnterIdleState();
-                    neighbour.StopAllJobs();
-                    brainScript.Stop(neighbour);
-                    brainScript.SetState(method);
-                    brainScript.Run(neighbour);
-
-                    Log.Info($"State: {brainState.ToString()} - {brainState.Method.Name} StateInfo: {stateInfo}");
-                }
+                CollectAndWriteEntityActionHandlers();
             }
 
             foreach (var player in GetPlayerManager.Players.Values)
@@ -231,6 +205,120 @@ namespace NfhcModel.MonoBehaviours
                 }
                 Log.Info($"Successfully added new test woody!");
             }
+        }
+
+      private void CollectAndWriteEntityActionHandlers()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine("EntityActionHandler Report:");
+        sb.AppendLine();
+
+        // Find all EntityActionHandler components in the scene
+        EntityActionHandler[] handlers = FindObjectsOfType<EntityActionHandler>();
+
+        foreach (EntityActionHandler handler in handlers)
+        {
+            GameObject obj = handler.gameObject;
+            sb.AppendLine($"GameObject: {obj.name}");
+            sb.AppendLine($"EntityActionHandler for {obj.name}:");
+            sb.AppendLine($"Number of Actions: {handler.Count}");
+            sb.AppendLine();
+
+            foreach (EntityAction action in handler.Actions)
+            {
+                sb.AppendLine($"  Action Name: {action.ActionName}");
+                sb.AppendLine($"    Noise Level: {action.NoiseLevel}");
+                sb.AppendLine($"    Duration: {action.Duration}");
+                sb.AppendLine($"    Show Progress: {action.ShowProgress}");
+                sb.AppendLine($"    Object Animation Name: {action.ObjectAnimName}");
+                sb.AppendLine($"    Object Next Animation Name: {action.ObjectNextAnimName}");
+                sb.AppendLine($"    Actor Name: {action.ActorName}");
+                sb.AppendLine($"    Actor Animation Name: {action.ActorAnimName}");
+                sb.AppendLine($"    Actor Next Animation Name: {action.ActorNextAnimName}");
+                sb.AppendLine($"    Behavior Name: {action.BehaviorName}");
+                sb.AppendLine($"    Behavior Actor Name: {action.BehaviorActorName}");
+                sb.AppendLine($"    Trigger Always: {action.TriggerAlways}");
+                sb.AppendLine($"    Number of Tricks: {action.Tricks.Count}");
+                sb.AppendLine($"    Number of Translations: {action.Translations?.Count ?? 0}");
+                sb.AppendLine();
+            }
+
+            // If jobs are accessible, include their details as well using reflection
+            ActorBrain actorBrain = handler.GetComponent<ActorBrain>();
+            if (actorBrain != null)
+            {
+                sb.AppendLine($"ActorBrain for {obj.name}:");
+
+                // Use reflection to get the private jobStack field
+                FieldInfo jobStackField = typeof(ActorBrain).GetField("jobStack", BindingFlags.NonPublic | BindingFlags.Instance);
+                if (jobStackField != null)
+                {
+                    object jobStackValue = jobStackField.GetValue(actorBrain);
+                    if (jobStackValue != null)
+                    {
+                        Type jobStackType = jobStackValue.GetType();
+                        PropertyInfo countProperty = jobStackType.GetProperty("Count");
+                        if (countProperty != null)
+                        {
+                            int jobCount = (int)countProperty.GetValue(jobStackValue);
+                            sb.AppendLine($"Number of Jobs: {jobCount}");
+                            sb.AppendLine();
+
+                            MethodInfo toArrayMethod = jobStackType.GetMethod("ToArray");
+                            if (toArrayMethod != null)
+                            {
+                                Array jobArray = (Array)toArrayMethod.Invoke(jobStackValue, null);
+                                foreach (var job in jobArray)
+                                {
+                                    Type jobType = job.GetType();
+                                    PropertyInfo nameProperty = jobType.GetProperty("Name");
+                                    PropertyInfo isStoppableProperty = jobType.GetProperty("IsStoppable");
+                                    MethodInfo getStateInfoMethod = jobType.GetMethod("GetStateInfo");
+
+                                    string jobName = nameProperty != null ? (string)nameProperty.GetValue(job) : "Unknown";
+                                    bool isStoppable = isStoppableProperty != null && (bool)isStoppableProperty.GetValue(job);
+                                    string stateInfo = getStateInfoMethod != null ? (string)getStateInfoMethod.Invoke(job, new object[] { actorBrain }) : "No State Info";
+
+                                    sb.AppendLine($"  Job Name: {jobName}");
+                                    sb.AppendLine($"    Is Stoppable: {isStoppable}");
+                                    sb.AppendLine($"    Details: {stateInfo}");
+                                    sb.AppendLine();
+                                }
+                            }
+                        }
+                    }
+                }
+                sb.AppendLine();
+            }
+        }
+
+        // Define the path for the output file
+        string path = Path.Combine(Application.dataPath, "EntityActionHandlerReport.txt");
+
+        // Write the collected information to the file
+        File.WriteAllText(path, sb.ToString());
+
+        Debug.Log($"EntityActionHandler report written to {path}");
+    }
+
+        void WriteGameObjectHierarchy(XmlWriter writer, GameObject gameObject)
+        {
+            writer.WriteStartElement("GameObject");
+            writer.WriteAttributeString("name", gameObject.name);
+
+            foreach (Component component in gameObject.GetComponents<Component>())
+            {
+                writer.WriteStartElement("Component");
+                writer.WriteAttributeString("type", component.GetType().Name);
+                writer.WriteEndElement();
+            }
+
+            foreach (Transform child in gameObject.transform)
+            {
+                WriteGameObjectHierarchy(writer, child.gameObject);
+            }
+
+            writer.WriteEndElement();
         }
 
         private void SetupDieCommands(ActorBrain woody, ActorBrain neighbour)

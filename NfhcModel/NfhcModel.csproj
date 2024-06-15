@@ -95,6 +95,7 @@
     <Compile Include="MonoBehaviours\Gui\ChatHandler.cs" />
     <Compile Include="MonoBehaviours\Gui\MainMenu\MainMenuMods.cs" />
     <Compile Include="MonoBehaviours\Gui\UiTimer.cs" />
+    <Compile Include="MonoBehaviours\Logic\BrainInjector.cs" />
     <Compile Include="MonoBehaviours\Logic\LogicTesting.cs" />
     <Compile Include="MonoBehaviours\Multiplayer.cs" />
     <Compile Include="MonoBehaviours\NfhcBootstrapper.cs" />
@@ -119,6 +120,12 @@
     <Compile Include="Network\Messages\PlayerPosition.cs" />
     <Compile Include="Network\Messages\SceneLoadingSync.cs" />
     <Compile Include="Network\PlayerManager.cs" />
+    <Compile Include="Network\ServerModul\Commands\ChatCommand.cs" />
+    <Compile Include="Network\ServerModul\Commands\GetCommands.cs" />
+    <Compile Include="Network\ServerModul\Commands\ListEntitiesCommand.cs" />
+    <Compile Include="Network\ServerModul\Commands\ListStatesCommand.cs" />
+    <Compile Include="Network\ServerModul\Commands\GetState.cs" />
+    <Compile Include="Network\ServerModul\Commands\SetStateCommand.cs" />
     <Compile Include="Network\ServerModul\Server.cs" />
     <Compile Include="Network\ServerModul\ServerConfig.cs" />
     <Compile Include="Network\ServerModul\ServerProcessors\ServerChatProcessor.cs" />
@@ -132,6 +139,7 @@
     <Compile Include="Patches\INfhcPatch.cs" />
     <Compile Include="Patches\IPersistentPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestBrains\NeighborBrain.cs" />
     <Compile Include="Unity\Helper\AssetBundleLoader.cs" />
     <Compile Include="Unity\Helper\DebugUtils.cs" />
     <Compile Include="Unity\Helper\GameObjectHelper.cs" />

@@ -23,7 +23,7 @@ namespace NfhcModel.Network.ClientModul.ClientProcessors
 
         public ClientChatProcessor()
         {
-            
+
         }
 
         public override bool AddMessage(byte[] message, DataStructures.PlayerData player)
@@ -32,8 +32,7 @@ namespace NfhcModel.Network.ClientModul.ClientProcessors
             try
             {
                 chatMessage = BaseMessageType.Deserialize<ChatMessage>(message);
-            }
-            catch (InvalidCastException ex)
+            } catch (InvalidCastException ex)
             {
                 return false;
             }
@@ -59,7 +58,16 @@ namespace NfhcModel.Network.ClientModul.ClientProcessors
             {
                 ChatMessage chatMessage = IncomingMessages.Dequeue();
                 Log.Info($"Chat: {chatMessage.MessageText}");
-                GetClient.chatHandler.AddMessage(chatMessage.MessageText, chatMessage.SenderID);
+                var message = "";
+
+                if (!string.IsNullOrEmpty(chatMessage.PlayerName))
+                {
+                    message = chatMessage.PlayerName + ";";
+                }
+
+                message += chatMessage.MessageText;
+
+                GetClient.chatHandler.AddMessage(message, chatMessage.SenderID);
             }
 
             while (OutgoingMessages.Any())

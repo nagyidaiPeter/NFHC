@@ -1,6 +1,7 @@
 ﻿using System;
 using NfhcModel.Logger;
 using NfhcModel.MonoBehaviours.Gui.MainMenu;
+using NfhcModel.MonoBehaviours.Logic;
 using UnityEngine;
 
 namespace NfhcModel.MonoBehaviours
@@ -20,6 +21,7 @@ namespace NfhcModel.MonoBehaviours
             gameObject.AddComponent<MainMenuMods>();
             gameObject.AddComponent<SceneSyncer>();
             gameObject.AddComponent<Multiplayer>();
+            gameObject.AddComponent<BrainInjector>();
 
         }
 

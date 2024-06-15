@@ -1,9 +1,4 @@
 ﻿using ProtoBuf;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NfhcModel.Network.Messages
 {
@@ -11,6 +6,9 @@ namespace NfhcModel.Network.Messages
     public class ChatMessage : BaseMessageType
     {
         [ProtoMember(1)]
+        public string PlayerName { get; set; }
+
+        [ProtoMember(2)]
         public string MessageText { get; set; }
 
         public ChatMessage()
